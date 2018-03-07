@@ -1,0 +1,87 @@
+/*
+http://colorschemedesigner.com/csd-3.5/#1b321w0w0w0w0
+http://colorschemedesigner.com/csd-3.5/#3s21T7BVxw0w0
+*/
+body{
+    background-color: #B9DEEF;
+}
+table#tablero tr td{
+    width: 80px;
+    height: 80px;
+    border: 1px solid black;
+    border-collapse: collapse;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+table{
+    border-spacing: 0;
+    float: left;
+    margin: 2% 5%;
+}
+table tr td.white{
+    background-color: white;
+    /*background-color: #FFEAD2;*/
+}
+table tr td.black{
+    /*background-color: black;*/
+    background-color: #3C7C9B;
+}
+
+td.casellaSeleccionada{
+    background-color: green;
+}
+
+td.reiJaque{
+    background-color: red;
+}
+
+td.casellaPreMoviment{
+    background-color: yellow;
+}
+div.informacio{
+    min-height: 630px;
+    width: 20%;
+    float: left;
+    border: 1px solid black;
+    border-radius: 5px;
+    margin-left: 2%;
+    margin-top: 2%;
+    background-color: #71C7BF;
+}
+h1.titolInformacio, div.contenidorInformacio{
+    margin: 0;
+    width:100%;
+    height:100%;
+    text-align: center;
+}
+div.contenidorInformacio{
+
+}
+h1.titolInformacio{
+    background-color: #39AECF;
+    border-radius: 5px 5px 0px 0px;
+}
+p#torn{
+    margin: 0;
+    line-height: 80px;
+    vertical-align: middle;
+    height: 80px;
+    font-size: 32px;
+}
+
+p.blanc{
+    background-color: white;
+    color: black;
+}
+
+p.negre{
+    background-color: black;
+    color: white;
+}
+img.imatgeTurno{
+    width: 70px;
+    height: 70px;
+    line-height: 80px;
+    vertical-align: middle;
+}
