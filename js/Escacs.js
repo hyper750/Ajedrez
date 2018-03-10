@@ -159,9 +159,9 @@ function Escacs(temps) {
         }
     };
 
-    this.reiAmbJaqueTurnoActual = function () {
+    this.reiAmbJaqueTurnoActual = function (color) {
         var turno = "white";
-        if(this.torn === 1){
+        if(color === 1){
             turno = "black";
         }
         for(var x = 0; x < this.caselles.length; x++){
@@ -177,17 +177,18 @@ function Escacs(temps) {
     this.reiAmbJaqueMate = function () {
         //Si esta amb jaque
         //if(this.reiAmbJaqueTurnoActual()){
-            //Mogui on es mogui el rei està amenaçat de mort
+            //Seleccion es dos reis
+            this.calcularJaque();
             var reis = [];
             for(var x = 0; x < this.caselles.length; x++){
                 for(var y = 0; y < this.caselles[x].length; y++){
                     var cas = this.caselles[x][y];
                     if(cas.figura !== null && cas.figura instanceof Rei){
                         if(cas.figura.color === "white"){
-                            reis[0] = [x, y, true];
+                            reis[0] = [x, y, cas.figura.jaque];
                         }
                         else if(cas.figura.color === "black"){
-                            reis[1] = [x, y, true];
+                            reis[1] = [x, y, cas.figura.jaque];
                         }
                     }
                 }
@@ -200,25 +201,27 @@ function Escacs(temps) {
                 //Moure a totes ses posicions que pot es rei de preMoure
                 for(var t = 0; t < this.caselles.length && reis[i][2]; t++){
                     for(var p = 0; p < this.caselles[t].length && reis[i][2]; p++){
+                        this.deseleccionar();
                         this.caselles[reis[i][0]][reis[i][1]].seleccionada = true;
                         this.preMoure(reis[i][0], reis[i][1]);
                         var cas = this.caselles[t][p];
                         if(cas.preMoviment){
                             //Si es una casella que puc anar
+                            //Si hi ha una figura no s'elimini
+                            var figuraTmp = this.caselles[t][p].figura;
                             this.deseleccionarJaque();
-                            /*this.moure(t, p);
+                            this.moure(t, p);
                             this.calcularJaque();
                             if(!cas.figura.jaque){
                                 reis[i][2] = false;
                             }
-                            //Colocar com esteia
-                            this.caselles[reis[i][0]][reis[i][1]] = this.caselles[t][p];
-                            this.caselles[t][p] = null;*/
+                            this.caselles[reis[i][0]][reis[i][1]].figura = this.caselles[t][p].figura;
+                            this.caselles[t][p].figura = figuraTmp;
                         }
                     }
                 }
-                this.deseleccionarJaque();
                 this.deseleccionar();
+                this.deseleccionarJaque();
                 this.calcularJaque();
             }
 
@@ -591,6 +594,22 @@ function msgNoEsElTeuTorn(escacs){
     alert("No es el teu torn");
 }
 
+function msgJaqueMate(escacs){
+    var guanyador = "blanques";
+    if(escacs.torn == 1){
+        guanyador = "negres";
+    }
+    alert("Han guanyat les " + guanyador + " per jaque mate");
+}
+
+function msgAhogado(escacs) {
+    var guanyador = "blanques";
+    if(escacs.torn == 1){
+        guanyador = "negres";
+    }
+    alert("Han guanyat les " + guanyador + " per jaque per ahogado");
+}
+
 function pintar(escacs, tablero, titol) {
     tablero.text("");
     for(var x = 0; x < escacs.caselles.length; x++){
@@ -613,25 +632,38 @@ function pintar(escacs, tablero, titol) {
                         pintarTorn(escacs);
                         //I també mirar si es rei esta amb jaque
                         escacs.calcularJaque();
+                        pintar(escacs, tablero, titol);
                         //Mir si es jaquemate
                         //Si es jaquemate posarà acabate = true
-                        if(escacs.reiAmbJaqueTurnoActual()){
-                            //Si actualment està amb jaque i no pot sortir es jaquemate
-                            escacs.reiAmbJaqueMate();
+                        var colorJaque = escacs.reiAmbJaqueMate();
+                        console.log(colorJaque);
+                        if(colorJaque[0] || colorJaque[1]){
+                            escacs.acabat = true;
+                            var quin;
+                            if(colorJaque[0]){
+                                quin = 0;
+                            }
+                            else if(colorJaque[1]){
+                                quin = 1;
+                            }
+                            //Si es blancs estan amb jaque mate
+                            if(escacs.reiAmbJaqueTurnoActual(quin)){
+                                //JaqueMate
+                                msgJaqueMate(escacs);
+                            }
+                            else{
+                                //Jaque per ahogado
+                                msgAhogado(escacs);
+                            }
                         }
-                        else{
-                            //Si no està amb jaque pero faixi lo que faixi estarà amb jaque es jaque per ahogado
-                            escacs.reiAmbJaqueMate();
-                        }
-                        pintar(escacs, tablero, titol);
                         //Msg guanyador
-                        if(escacs.acabat){
+                        else if(escacs.acabat){
                             msgGuanyador(escacs);
                         }
                     }
                     else if (casella.figura !== null) {
                         //Nomes es pugui moure si no està amb jaque o si esta amb jaque i has seleccionat es rei
-                        if(!escacs.reiAmbJaqueTurnoActual() || (escacs.reiAmbJaqueTurnoActual() && casella.figura instanceof Rei)){
+                        if(!escacs.reiAmbJaqueTurnoActual(escacs.torn) || (escacs.reiAmbJaqueTurnoActual(escacs.torn) && casella.figura instanceof Rei)){
                             //0 blanques
                             //1 negres
                             var color;
