@@ -198,8 +198,8 @@ function Escacs(temps) {
             //Moure es rei a ses posicions i mirar si està en jaque
             //Si a totes ses posicions està en jaque es jaque mate
             //Moure a totes ses posicions que pot es rei de preMoure
-            for(var t = 0; t < this.caselles.length && reis[i][2]; t++){
-                for(var p = 0; p < this.caselles[t].length && reis[i][2]; p++){
+            for(var t = 0; t < this.caselles.length; t++){
+                for(var p = 0; p < this.caselles[t].length; p++){
                     this.deseleccionar();
                     this.caselles[reis[i][0]][reis[i][1]].seleccionada = true;
                     this.preMoure(reis[i][0], reis[i][1]);
@@ -222,50 +222,43 @@ function Escacs(temps) {
             this.deseleccionar();
             this.deseleccionarJaque();
             this.calcularJaque();
-        }
 
-        //0 blanc 1 negre i diu si esta amb jaquemate per color
-        return [reis[0][2], reis[1][2]];
-    };
-
-    this.figuraPerInterceptarRei = function (x, y) {
-        //Si amb sa figura puc fer que es rei no estigui amb jaque
-        var selec = this.caselles[x][y];
-        //Si cap moviment de sa figura seleccionada puc fer que no estigui en jaque
-        for(var i = 0; i < this.caselles.length; i++){
-            for(var j = 0; j < this.caselles[i].length; j++){
-                this.deseleccionar();
-                this.deseleccionarJaque();
-                selec.seleccionada = true;
-                this.preMoure(x, y);
-                var cas = this.caselles[i][j];
-                if(cas.preMoviment){
-                    var tmpFigura = cas.figura;
-                    this.moure(i, j);
-                    this.calcularJaque();
-                    //Després de moure es rei està amb jaque
-                    var color = 0;
-                    if(selec.figura.color === "black"){
-                        color = 1;
-                    }
-
-                    if(!this.reiAmbJaqueTurnoActual(color)){
-                        //Restaurar
-                        this.caselles[x][y].figura = this.caselles[i][j].figura;
-                        this.caselles[i][j].figura = tmpFigura;
-                        this.deseleccionarJaque();
+            //Si no puc moure una casella des mateix equip que es rei perque no estigui en jaque
+            var rei = this.caselles[reis[i][0]][reis[i][1]];
+            sortida:
+            for(var t = 0; t < this.caselles.length; t++){
+                for(var p = 0; p < this.caselles[t].length; p++){
+                    var seg = this.caselles[t][p];
+                    if(seg.figura !== null && seg.figura.color === rei.figura.color && reis[i][0] !== t && reis[i][1] !== p){
                         this.deseleccionar();
-                        this.calcularJaque();
-                        return true;
+                        this.deseleccionarJaque();
+                        seg.seleccionada = true;
+                        this.preMoure(t, p);
+                        //Moure sa figura
+                        for(var u = 0; u < this.caselles.length; u++){
+                            for(var k = 0; k < this.caselles[u].length; k++){
+                                var desti = this.caselles[u][k];
+                                if(desti.preMoviment){
+                                    var figuraTmp = this.caselles[u][k].figura;
+                                    this.moure(u, k);
+                                    this.calcularJaque();
+                                    this.caselles[t][p].figura = this.caselles[u][k].figura;
+                                    this.caselles[u][k].figura = figuraTmp;
+                                    if(!rei.jaque){
+                                        reis[i][2] = false;
+                                        break sortida;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
 
-        this.deseleccionarJaque();
-        this.deseleccionar();
-        this.calcularJaque();
-        return false;
+
+        //0 blanc 1 negre i diu si esta amb jaquemate per color
+        return [reis[0][2], reis[1][2]];
     };
 }
 
