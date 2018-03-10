@@ -1,5 +1,7 @@
-function Temps(){
-    this.tempsActual = 0;
+//Temps en minuts
+function Temps(temps){
+    //Pas a ms
+    this.tempsActual = temps * 60000;
     this.tempsSessio = null;
 
     this.startSessio = function () {
@@ -17,13 +19,15 @@ function Temps(){
     };
 }
 
-function Escacs() {
+function Escacs(temps) {
     const AMPLADA = 8;
     const ALTURA = 8;
     //0 torn blanques
     //1 torn negres
     this.torn = 0;
-    this.equipTemps = [new Temps(), new Temps()];
+    //temps 0 blanques
+    //temps 1 negres
+    this.equipTemps = [new Temps(temps), new Temps(temps)];
     this.acabat = false;
     this.casellaSeleccionada = null;
     this.caselles = [];
@@ -78,6 +82,7 @@ function Escacs() {
         }
     };
 
+    //x i y es sa casella seleccionada
     this.preMoure = function (x, y) {
         //Retorna es moviments que pot fer
         var casella = this.caselles[x][y];
@@ -86,6 +91,7 @@ function Escacs() {
         }
     };
 
+    //x i y son a von vol anar
     this.moure = function (x, y) {
         //Agaf sa seleccionada i sa nova posició es sa x:y
         var selec = null;
@@ -146,7 +152,7 @@ function Escacs() {
     this.deseleccionarJaque = function () {
         for(var x = 0; x < this.caselles.length; x++){
             for(var y = 0; y < this.caselles[x].length; y++){
-                if(this.caselles[x][y].figura != null && this.caselles[x][y].figura instanceof Rei){
+                if(this.caselles[x][y].figura !== null && this.caselles[x][y].figura instanceof Rei){
                     this.caselles[x][y].figura.jaque = false;
                 }
             }
@@ -166,6 +172,60 @@ function Escacs() {
                 }
             }
         }
+    };
+
+    this.reiAmbJaqueMate = function () {
+        //Si esta amb jaque
+        //if(this.reiAmbJaqueTurnoActual()){
+            //Mogui on es mogui el rei està amenaçat de mort
+            var reis = [];
+            for(var x = 0; x < this.caselles.length; x++){
+                for(var y = 0; y < this.caselles[x].length; y++){
+                    var cas = this.caselles[x][y];
+                    if(cas.figura !== null && cas.figura instanceof Rei){
+                        if(cas.figura.color === "white"){
+                            reis[0] = [x, y, true];
+                        }
+                        else if(cas.figura.color === "black"){
+                            reis[1] = [x, y, true];
+                        }
+                    }
+                }
+            }
+            //Es dos reis trobats
+            //Mirar si es poden moure o matar
+            for(var i = 0; i < reis.length; i++){
+                //Moure es rei a ses posicions i mirar si està en jaque
+                //Si a totes ses posicions està en jaque es jaque mate
+                //Moure a totes ses posicions que pot es rei de preMoure
+                for(var t = 0; t < this.caselles.length && reis[i][2]; t++){
+                    for(var p = 0; p < this.caselles[t].length && reis[i][2]; p++){
+                        this.caselles[reis[i][0]][reis[i][1]].seleccionada = true;
+                        this.preMoure(reis[i][0], reis[i][1]);
+                        var cas = this.caselles[t][p];
+                        if(cas.preMoviment){
+                            //Si es una casella que puc anar
+                            this.deseleccionarJaque();
+                            /*this.moure(t, p);
+                            this.calcularJaque();
+                            if(!cas.figura.jaque){
+                                reis[i][2] = false;
+                            }
+                            //Colocar com esteia
+                            this.caselles[reis[i][0]][reis[i][1]] = this.caselles[t][p];
+                            this.caselles[t][p] = null;*/
+                        }
+                    }
+                }
+                this.deseleccionarJaque();
+                this.deseleccionar();
+                this.calcularJaque();
+            }
+
+            //0 blanc 1 negre i diu si esta amb jaquemate per color
+            return [reis[0][2], reis[1][2]];
+
+        //}
     };
 }
 
@@ -553,6 +613,16 @@ function pintar(escacs, tablero, titol) {
                         pintarTorn(escacs);
                         //I també mirar si es rei esta amb jaque
                         escacs.calcularJaque();
+                        //Mir si es jaquemate
+                        //Si es jaquemate posarà acabate = true
+                        if(escacs.reiAmbJaqueTurnoActual()){
+                            //Si actualment està amb jaque i no pot sortir es jaquemate
+                            escacs.reiAmbJaqueMate();
+                        }
+                        else{
+                            //Si no està amb jaque pero faixi lo que faixi estarà amb jaque es jaque per ahogado
+                            escacs.reiAmbJaqueMate();
+                        }
                         pintar(escacs, tablero, titol);
                         //Msg guanyador
                         if(escacs.acabat){
@@ -560,6 +630,7 @@ function pintar(escacs, tablero, titol) {
                         }
                     }
                     else if (casella.figura !== null) {
+                        //Nomes es pugui moure si no està amb jaque o si esta amb jaque i has seleccionat es rei
                         if(!escacs.reiAmbJaqueTurnoActual() || (escacs.reiAmbJaqueTurnoActual() && casella.figura instanceof Rei)){
                             //0 blanques
                             //1 negres
@@ -621,6 +692,6 @@ function pintar(escacs, tablero, titol) {
 $(document).ready(function () {
     var tablero = $("#tablero");
     var torn = $("#torn");
-    var escacs = new Escacs();
+    var escacs = new Escacs(90);
     pintar(escacs, tablero, torn);
 });
