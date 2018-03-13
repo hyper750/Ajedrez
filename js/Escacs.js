@@ -28,6 +28,9 @@ function Escacs(temps) {
     //temps 0 blanques
     //temps 1 negres
     this.equipTemps = [new Temps(temps), new Temps(temps)];
+    //Llista 0 blanques
+    //Llista 1 negres
+    this.llistaMoviments = [[], []];
     this.acabat = false;
     this.casellaSeleccionada = null;
     this.caselles = [];
@@ -65,7 +68,7 @@ function Escacs(temps) {
         this.caselles[x][AMPLADA - 2].figura = new Cavall(color[num]);
         this.caselles[x][2].figura = new Alfil(color[num]);
         this.caselles[x][AMPLADA - 3].figura = new Alfil(color[num]);
-        this.caselles[x][3].figura = new Reina(color[num]);
+          this.caselles[x][3].figura = new Reina(color[num]);
         this.caselles[x][AMPLADA-4].figura = new Rei(color[num]);
         num++;
     }
@@ -91,18 +94,28 @@ function Escacs(temps) {
         }
     };
 
-    //x i y son a von vol anar
-    this.moure = function (x, y) {
-        //Agaf sa seleccionada i sa nova posició es sa x:y
-        var selec = null;
+    this.posicioPecaSeleccionada = function () {
         for(var t = 0; t < this.caselles.length; t++){
             for(var p = 0; p < this.caselles[t].length; p++){
                 var tmp = this.caselles[t][p];
                 if(tmp.seleccionada){
-                    selec = tmp;
+                    return [t, p];
                 }
             }
         }
+
+        return [];
+    };
+
+    this.pecaSeleccionada = function () {
+        var posicio = this.posicioPecaSeleccionada();
+        return this.caselles[posicio[0]][posicio[1]];
+    };
+
+    //x i y son a von vol anar
+    this.moure = function (x, y) {
+        //Agaf sa seleccionada i sa nova posició es sa x:y
+        var selec = this.pecaSeleccionada();
 
         var novaCasella = this.caselles[x][y];
         if(novaCasella.preMoviment){
@@ -300,6 +313,7 @@ function Figura(color) {
 //Per cada figura posar una descendent i cada una amb es seu moviment
 function Peon(color) {
     Figura.call(this, color);
+    this.nom = "Peon";
     this.imatge = "img/";
     this.inicial = true;
     if (this.color == "white") {
@@ -381,6 +395,7 @@ Peon.prototype.constructor = Peon;
 
 function Torre(color){
     Figura.call(this, color);
+    this.nom = "Torre";
     this.imatge = "img/";
     if(this.color == "white"){
         this.imatge += "blanques/";
@@ -458,6 +473,7 @@ Torre.prototype.constructor = Torre;
 
 function Cavall(color){
     Figura.call(this, color);
+    this.nom = "Cavall";
     this.imatge = "img/";
     if(this.color == "white"){
         this.imatge += "blanques/";
@@ -487,6 +503,7 @@ Cavall.prototype.constructor = Cavall;
 
 function Alfil(color){
     Figura.call(this, color);
+    this.nom = "Alfil";
     this.imatge = "img/";
     if(this.color == "white"){
         this.imatge += "blanques/";
@@ -550,6 +567,7 @@ Alfil.prototype.constructor = Alfil;
 
 function Rei(color){
     Figura.call(this, color);
+    this.nom = "Rei";
     this.jaque = false;
     this.imatge = "img/";
     if(this.color == "white"){
@@ -576,6 +594,7 @@ Rei.prototype.constructor = Rei;
 
 function Reina(color){
     Figura.call(this, color);
+    this.nom = "Reina";
     this.imatge = "img/";
     if(this.color == "white"){
         this.imatge += "blanques/";
@@ -606,6 +625,22 @@ function pintarTorn(escacs) {
         }
         $("#torn").fadeIn("fast");
     });
+}
+
+function Moviment(tipus, origen, desti) {
+    this.tipus = tipus;
+    this.origen = origen;
+    this.desti = desti;
+}
+
+function pintarLlistaMoviments(escacs) {
+    var llistaPerTorn = escacs.llistaMoviments[escacs.torn];
+    var resultat = "";
+    for(var x = 0; x < llistaPerTorn.length; x++){
+        resultat += llistaPerTorn[x].tipus + " de " + llistaPerTorn[x].origen.formatEscacs() + " a " + llistaPerTorn[x].desti.formatEscacs() + "<br/>";
+    }
+
+    $("#llistaMoviments").html(resultat);
 }
 
 function msgGuanyador(escacs) {
@@ -640,7 +675,18 @@ function msgAhogado(escacs) {
     alert("Han guanyat les " + guanyador + " per jaque per ahogado");
 }
 
-function pintar(escacs, tablero, titol) {
+function Punt(y, x) {
+    const LLETRES_HORIZONTAL = ["A", "B", "C", "D", "E", "F", "G", "H"];
+    const NUMEROS_VERTICALS = ["8", "7", "6", "5", "4", "3", "2", "1"];
+    this.y = y;
+    this.x = x;
+
+    this.formatEscacs = function () {
+        return LLETRES_HORIZONTAL[this.x] + NUMEROS_VERTICALS[this.y];
+    };
+}
+
+function pintar(escacs, tablero) {
     tablero.text("");
     for(var x = 0; x < escacs.caselles.length; x++){
         var tr = $("<tr></tr>");
@@ -656,13 +702,18 @@ function pintar(escacs, tablero, titol) {
                     if(casella.preMoviment){
                         //Si estic en jaque tenc que fer algo perque no estigui en jaque, moure es rei,
                         //Si no estic en jaque puc moure ses peces
+                        var seleccionada = escacs.posicioPecaSeleccionada();
+                        var peca = escacs.caselles[seleccionada[0]][seleccionada[1]].figura;
                         escacs.moure(separat[0], separat[1]);
-                        escacs.torn = (escacs.torn + 1) % 2;
-                        //Una vegada que canviat de torn canviar color des torn
+                        //Antes de canviar el torn afegir a sa llista de moviments
+                        escacs.llistaMoviments[escacs.torn].push(new Moviment(peca.nom, new Punt(seleccionada[0], seleccionada[1]), new Punt(separat[0], separat[1])));
                         pintarTorn(escacs);
+                        escacs.torn = (escacs.torn + 1) % 2;
+                        pintarLlistaMoviments(escacs);
+                        //Una vegada que canviat de torn canviar color des torn
                         //I també mirar si es rei esta amb jaque
                         escacs.calcularJaque();
-                        pintar(escacs, tablero, titol);
+                        pintar(escacs, tablero);
                         //Mir si es jaquemate
                         //Si es jaquemate posarà acabate = true
                         var colorJaque = escacs.reiAmbJaqueMate();
@@ -713,7 +764,7 @@ function pintar(escacs, tablero, titol) {
                                 casella.seleccionada = true;
                                 //Pintar de nou
                                 escacs.preMoure(separat[0], separat[1]);
-                                pintar(escacs, tablero, titol);
+                                pintar(escacs, tablero);
                             }
                             else {
                                 msgNoEsElTeuTorn(escacs)
@@ -756,7 +807,6 @@ function pintar(escacs, tablero, titol) {
 //Canviar es color des panel d'informació segons es torn
 $(document).ready(function () {
     var tablero = $("#tablero");
-    var torn = $("#torn");
     var escacs = new Escacs(90);
-    pintar(escacs, tablero, torn);
+    pintar(escacs, tablero);
 });

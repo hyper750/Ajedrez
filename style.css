@@ -85,3 +85,10 @@ img.imatgeTurno{
     line-height: 80px;
     vertical-align: middle;
 }
+
+#llistaMoviments{
+    background-color: #39AECF;
+    margin: 0;
+    overflow-y: auto;
+    height: 520px;
+}
