@@ -92,3 +92,43 @@ img.imatgeTurno{
     overflow-y: auto;
     height: 520px;
 }
+
+#canviarFigura h2{
+    text-align: center;
+}
+#canviarFigura{
+    background-color: white;
+    border-radius: 10px;
+    width:30%;
+    height: 100px;
+    z-index: 5;
+    position: fixed;
+    left: 35%;
+    top: -300px;
+    padding: 2%;
+    color: black;
+    box-shadow: 5px 5px 20px;
+}
+
+#canviarFigura input[type="submit"]{
+    border-radius: 5px;
+    background-color: #ccc;
+    box-shadow: 2px 2px 1px;
+    border: none;
+}
+
+#canviarFigura input[type="submit"]:hover{
+    box-shadow: 2px 2px 5px;
+}
+
+.float-left{
+    float:left;
+}
+
+.float-right{
+    float:right;
+}
+select{
+    margin-bottom: 2%;
+    width: 60%;
+}
