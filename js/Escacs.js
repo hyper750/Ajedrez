@@ -13,9 +13,23 @@ function Temps(temps){
     this.restarSessio = function () {
         var actual = new Date();
         if(this.tempsSessio !== null){
-            this.tempsActual -= (this.actual - this.tempsSessio);
+            this.tempsActual -= (actual - this.tempsSessio);
             this.tempsSessio = null;
         }
+    };
+
+    this.getTemps = function (ms) {
+        var m = parseInt(ms / 60000);
+        var s = parseInt((ms - (m * 60000)) / 1000);
+        m = m.toString();
+        while(m.length < 2){
+            m = "0" + m;
+        }
+        s = s.toString();
+        while(s.length < 2){
+            s = "0" + s;
+        }
+        return m + ":" + s;
     };
 }
 
@@ -28,6 +42,7 @@ function Escacs(temps) {
     //temps 0 blanques
     //temps 1 negres
     this.equipTemps = [new Temps(temps), new Temps(temps)];
+    this.intervalTemps = new IntervalTemps();
     //Llista 0 blanques
     //Llista 1 negres
     this.figuresMortes = [];
@@ -126,25 +141,25 @@ function Escacs(temps) {
     };
 
     //x i y son a von vol anar
-    this.moure = function (x, y) {
+    this.moure = function (x, y, simulacio) {
         //Agaf sa seleccionada i sa nova posició es sa x:y
         var selec = this.pecaSeleccionada();
 
         var novaCasella = this.caselles[x][y];
         if(novaCasella.preMoviment){
-            if(novaCasella.figura !== null && novaCasella.figura instanceof Rei && !this.acabat){
+            if(!simulacio && novaCasella.figura !== null && novaCasella.figura instanceof Rei && !this.acabat){
                 //Si té menjes es rei acabar es joc
                 this.acabat = true;
                 msgGuanyador(this);
                 this.torn = (this.torn + 1) % 2;
             }
             //Si té una figura
-            if(novaCasella.figura !== null){
+            if(!simulacio && novaCasella.figura !== null){
                 this.figuresMortes.push(novaCasella.figura);
             }
             novaCasella.figura = selec.figura;
             selec.figura = null;
-            if(novaCasella.figura instanceof Peon){
+            if(!simulacio && novaCasella.figura instanceof Peon){
                 //Primera vegada
                 if(novaCasella.figura.inicial) {
                     novaCasella.figura.inicial = false;
@@ -189,8 +204,47 @@ function Escacs(temps) {
         this.deseleccionar();
     };
 
-    this.calcularJaqueMate = function () {
-        
+    this.calcularJaqueMate = function (color) {
+        var col = "white";
+        if(color === 1){
+            col = "black";
+        }
+        var rei = null;
+        var xRei;
+        var yRei;
+        for(var x = 0; x < this.caselles.length; x++){
+            for(var y = 0; y < this.caselles[x].length; y++){
+                var cas = this.caselles[x][y];
+                if(cas.figura !== null && cas.figura instanceof Rei && cas.figura.color === col){
+                    rei = cas;
+                    xRei = x;
+                    yRei = y;
+                }
+            }
+        }
+
+        //Una vegada trobat es rei des color demanat
+        //Diferencia entre jaquemate i ahogado es si esta en jaque primer, mirar antes de sa funcio
+        if(rei !== null){
+            this.deseleccionarJaque();
+            //Mogui on me mogui estic en jaque
+            for(var x = 0; x < this.caselles.length; x++){
+                for(var y = 0; y < this.caselles[x].length; y++){
+                    var cas = this.caselles[x][y];
+                    cas.seleccionada = true;
+                    this.preMoure(xRei, yRei);
+                    if(cas.preMoviment){
+                        var tmpFigura = cas.figura;
+                        this.moure(x, y, true);
+
+                    }
+
+                }
+            }
+
+
+
+        }
     };
 
     this.deseleccionarJaque = function () {
@@ -652,6 +706,32 @@ function Punt(y, x) {
     };
 }
 
+function IntervalTemps(){
+    this.id = null;
+    this.startInterval = function () {
+        if(this.id === null) {
+            this.id = setInterval(function () {
+                var temps = $("#tempsTorn").text();
+                var tempsSplit = temps.split(":");
+                var m = parseInt(tempsSplit[0]) * 60000;
+                var s = parseInt(tempsSplit[1]) * 1000;
+                var ms = m + s;
+                ms -= 1000;
+                var t = new Temps();
+                var resultat = t.getTemps(ms);
+                $("#tempsTorn").text(resultat);
+            }, 1000);
+        }
+    };
+
+    this.stopInterval = function () {
+        if(this.id !== null) {
+            clearInterval(this.id);
+            this.id = null;
+        }
+    };
+}
+
 function pintar(escacs, tablero) {
     tablero.text("");
     for(var x = 0; x < escacs.caselles.length; x++){
@@ -670,11 +750,20 @@ function pintar(escacs, tablero) {
                         //Si no estic en jaque puc moure ses peces
                         var seleccionada = escacs.posicioPecaSeleccionada();
                         var peca = escacs.caselles[seleccionada[0]][seleccionada[1]].figura;
-                        escacs.moure(separat[0], separat[1]);
+                        escacs.moure(separat[0], separat[1], false);
                         //Antes de canviar el torn afegir a sa llista de moviments
                         escacs.llistaMoviments[escacs.torn].push(new Moviment(peca.nom, new Punt(seleccionada[0], seleccionada[1]), new Punt(separat[0], separat[1])));
                         pintarTorn(escacs);
+
+                        //Calcular temps i començar es següent turno
+                        escacs.equipTemps[escacs.torn].restarSessio();
+                        escacs.intervalTemps.stopInterval();
+                        var tempsTorn = escacs.equipTemps[escacs.torn];
+                        escacs.intervalTemps.startInterval();
                         escacs.torn = (escacs.torn + 1) % 2;
+                        $("#tempsTorn").text(escacs.equipTemps[escacs.torn].getTemps(escacs.equipTemps[escacs.torn].tempsActual));
+                        escacs.equipTemps[escacs.torn].startSessio();
+
                         pintarLlistaMoviments(escacs);
                         //Una vegada que canviat de torn canviar color des torn
                         //I també mirar si es rei esta amb jaque
@@ -743,22 +832,24 @@ $(document).ready(function () {
     tablero = $("#tablero");
     var escacs = new Escacs(90);
     pintar(escacs, tablero);
+    var tempsTorn = escacs.equipTemps[escacs.torn];
+    $("#tempsTorn").text(tempsTorn.getTemps(tempsTorn.tempsActual));
+    escacs.intervalTemps.startInterval();
+    escacs.equipTemps[escacs.torn].startSessio();
 
     $("#canviar").on("click", function () {
         $("#canviarFigura").animate({
             top: "-=500"
         });
         var selected = $("#figures :checked").val();
-        console.log("Index " + selected);
-        console.log("Canviar per " + escacs.figuresMortes[selected].nom + " >> " + escacs.figuresMortes[selected].color);
         //Figura morta seleccionada
         var casACanviar = escacs.sercarCanviar();
         if(casACanviar != null){
             casACanviar.canviar = false;
             casACanviar.figura = escacs.figuresMortes[selected];
             escacs.figuresMortes.splice(selected, 1);
-            console.log(escacs.figuresMortes.length);
             pintar(escacs, tablero);
         }
     });
+
 });
