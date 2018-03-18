@@ -65,14 +65,14 @@ function Escacs(temps) {
     //Colocar peces
     //NEGRES
     //PEONS
-    for(var x = 0; x < AMPLADA; x++){
+    /*for(var x = 0; x < AMPLADA; x++){
         this.caselles[1][x].figura = new Peon("black");
     }
     //BLANQUES
     //PEONS
     for(var x = 0; x < AMPLADA; x++){
         this.caselles[ALTURA-2][x].figura = new Peon("white");
-    }
+    }*/
 
     //TORRE CAVALL ALFIL REINA REI
     var color = ["black", "white"];
@@ -80,11 +80,11 @@ function Escacs(temps) {
     for(var x = 0; x < ALTURA; x += ALTURA-1) {
         this.caselles[x][0].figura = new Torre(color[num]);
         this.caselles[x][AMPLADA - 1].figura = new Torre(color[num]);
-        this.caselles[x][1].figura = new Cavall(color[num]);
-        this.caselles[x][AMPLADA - 2].figura = new Cavall(color[num]);
-        this.caselles[x][2].figura = new Alfil(color[num]);
-        this.caselles[x][AMPLADA - 3].figura = new Alfil(color[num]);
-        this.caselles[x][3].figura = new Reina(color[num]);
+        //this.caselles[x][1].figura = new Cavall(color[num]);
+       // this.caselles[x][AMPLADA - 2].figura = new Cavall(color[num]);
+        //this.caselles[x][2].figura = new Alfil(color[num]);
+        //this.caselles[x][AMPLADA - 3].figura = new Alfil(color[num]);
+        //this.caselles[x][3].figura = new Reina(color[num]);
         this.caselles[x][AMPLADA-4].figura = new Rei(color[num]);
         num++;
     }
@@ -821,10 +821,11 @@ function click(tthis, escacs, tablero) {
             //I també mirar si es rei esta amb jaque
 
             if(escacs.calcularJaqueMate(escacs.torn)){
+
                 //Si esta en jaque es jaquemate
                 escacs.calcularJaque();
                 var rei = escacs.sercarRei(escacs.torn);
-                console.log("Color " + rei.torn + " esta en jaque? " + rei.jaque);
+                escacs.torn = (escacs.torn + 1) % 2;
                 //Si està en jaque es jaquemate
                 if(rei.figura.jaque){
                     msgJaqueMate(escacs);
@@ -834,7 +835,7 @@ function click(tthis, escacs, tablero) {
                     msgAhogado(escacs);
                 }
                 //Si no esta en jaque per ahogado
-
+                escacs.acabat = true;
             }
 
             escacs.calcularJaque();
