@@ -22,23 +22,33 @@
 
         </table>
 
+        <!--Temps de cada turno-->
         <div class="informacio temps">
             <h1 class="titolInformacio">Temps</h1>
             <p id="tempsTorn"></p>
         </div>
 
+        <!--Llista peces mortes-->
         <div class="informacio caixaPecesMortes">
             <h1 class="titolInformacio">Figures mortes</h1>
             <p id="llistaPecesMortes"></p>
         </div>
 
         <!--Dialeg per canviar de figura-->
-        <div id="canviarFigura">
+        <div class="canviarFigura" id="canviarFigura">
             <h2>Selecciona una figura</h2>
             <select id="figures">
 
             </select><br/>
             <input type="submit" name="canviar" id="canviar" value="Canviar" class="float-right"/>
+        </div>
+
+        <!--Seleccionar es temps-->
+        <div class="canviarFigura" id="seleccionarTemps">
+            <h2>Temps</h2>
+            <label for="entradaTemps" id="labelTemps">Minuts</label><br/>
+            <input type="number" name="entradaTemps" id="entradaTemps" min="1" placeholder="Temps en minuts..."/><br/>
+            <input type="submit" name="enviarTemps" id="enviarTemps" value="Començar" class="float-right"/>
         </div>
 
     </body>

@@ -370,7 +370,7 @@ function Peon(color) {
                     diagonalDreta.preMoviment = true;
                 }
             }
-            //Si no tenc cap figura a sa que menjar després puc moure, si no obligat
+            //Si no tenc cap figura a sa que menjar després puc moure, si no obligat a menjar
             //if ((diagonalEsquerra == null || !diagonalEsquerra.preMoviment) && (diagonalDreta == null || !diagonalDreta.preMoviment)) {
                 var pases = 1;
                 if (this.inicial) {
@@ -905,13 +905,38 @@ function pintar(escacs, tablero) {
 
 $(document).ready(function () {
     var tablero = $("#tablero");
-    var escacs = new Escacs(120);
-    escacs.intervalTemps = new IntervalTemps(escacs);
-    pintar(escacs, tablero);
-    var tempsTorn = escacs.equipTemps[escacs.torn];
-    $("#tempsTorn").text(tempsTorn.getTemps(tempsTorn.tempsActual));
-    escacs.intervalTemps.startInterval();
-    escacs.equipTemps[escacs.torn].startSessio();
+    var escacs;
+    $("#seleccionarTemps").animate({
+        top: "+=500"
+    });
+
+    $("#enviarTemps").on("click", function () {
+        var temps = $("#entradaTemps");
+        var labelTemps = $("#labelTemps");
+        var tempsValor = parseInt(temps.val());
+
+        if(tempsValor >= 1) {
+            escacs = new Escacs(tempsValor);
+            escacs.intervalTemps = new IntervalTemps(escacs);
+            pintar(escacs, tablero);
+            var tempsTorn = escacs.equipTemps[escacs.torn];
+            $("#tempsTorn").text(tempsTorn.getTemps(tempsTorn.tempsActual));
+            escacs.intervalTemps.startInterval();
+            escacs.equipTemps[escacs.torn].startSessio();
+
+            $("#seleccionarTemps").animate({
+                top: "-=500"
+            });
+            $(".temps, .caixaPecesMortes, .informacio, #tablero").fadeIn();
+            temps.val("");
+            temps.removeClass("wrong-form");
+            labelTemps.removeClass("wrong-label");
+        }
+        else{
+            temps.addClass("wrong-form");
+            labelTemps.addClass("wrong-label");
+        }
+    });
 
     $("#canviar").on("click", function () {
         $("#canviarFigura").animate({
