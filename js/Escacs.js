@@ -660,9 +660,13 @@ function pintarLlistaMoviments(escacs) {
 function missatgeGeneral(text) {
     var camp = $("#missatgeGeneral");
     $("#totOpac").css("display", "block");
-    camp.text(text);
+    camp.html(text);
     camp.animate({
         top: "+=500"
+    });
+
+    $("#reiniciar").on("click", function () {
+        window.location.assign(window.location.href);
     });
 }
 
@@ -671,7 +675,7 @@ function msgGuanyador(escacs) {
     if(escacs.torn == 1){
         guanyador = "negres";
     }
-    missatgeGeneral("Han guanyat les " + guanyador);
+    missatgeGeneral("Han guanyat les " + guanyador + "<br/><input type='submit' id='reiniciar' value='Reiniciar partida'/>");
 }
 
 function msgNoEsElTeuTorn(escacs){
@@ -683,7 +687,7 @@ function msgJaqueMate(escacs){
     if(escacs.torn == 1){
         guanyador = "negres";
     }
-    missatgeGeneral("Han guanyat les " + guanyador + " per jaque mate");
+    missatgeGeneral("Han guanyat les " + guanyador + " per jaque mate<br/><input type='submit' id='reiniciar' value='Reiniciar partida'/>");
 }
 
 function msgAhogado(escacs) {
@@ -691,7 +695,7 @@ function msgAhogado(escacs) {
     if(escacs.torn == 1){
         guanyador = "negres";
     }
-    missatgeGeneral("Han guanyat les " + guanyador + " per jaque per ahogado");
+    missatgeGeneral("Han guanyat les " + guanyador + " per jaque per ahogado<br/><input type='submit' id='reiniciar' value='Reiniciar partida'/>");
 }
 function msgCanviarFigura(casella, escacs, tablero) {
     //casella.figura = new Torre(casella.figura.color);
@@ -978,5 +982,4 @@ $(document).ready(function () {
             $(this).css("display", "none");
         }
     });
-
 });
