@@ -656,20 +656,29 @@ function pintarLlistaMoviments(escacs) {
     $("#llistaMoviments").html(resultat);
 }
 
+function missatgeGeneral(text) {
+    var camp = $("#missatgeGeneral");
+    $("#totOpac").css("display", "block");
+    camp.text(text);
+    camp.animate({
+        top: "+=500"
+    });
+}
+
 function msgGuanyador(escacs) {
     var guanyador = "blanques";
     if(escacs.torn == 1){
         guanyador = "negres";
     }
-    alert("Han guanyat les " + guanyador);
+    missatgeGeneral("Han guanyat les " + guanyador);
 }
 
 function msgJaque(escacs) {
-    alert("Escolta es teu rei està amb jaque, mou-lo");
+    missatgeGeneral("Escolta es teu rei està amb jaque, mou-lo");
 }
 
 function msgNoEsElTeuTorn(escacs){
-    alert("No es el teu torn");
+    missatgeGeneral("No es el teu torn");
 }
 
 function msgJaqueMate(escacs){
@@ -677,7 +686,7 @@ function msgJaqueMate(escacs){
     if(escacs.torn == 1){
         guanyador = "negres";
     }
-    alert("Han guanyat les " + guanyador + " per jaque mate");
+    missatgeGeneral("Han guanyat les " + guanyador + " per jaque mate");
 }
 
 function msgAhogado(escacs) {
@@ -685,7 +694,7 @@ function msgAhogado(escacs) {
     if(escacs.torn == 1){
         guanyador = "negres";
     }
-    alert("Han guanyat les " + guanyador + " per jaque per ahogado");
+    missatgeGeneral("Han guanyat les " + guanyador + " per jaque per ahogado");
 }
 function msgCanviarFigura(casella, escacs, tablero) {
     //casella.figura = new Torre(casella.figura.color);
@@ -703,6 +712,7 @@ function msgCanviarFigura(casella, escacs, tablero) {
 
     if(cont > 0) {
         casella.canviar = true;
+        $("div#totOpac").css("display", "block");
         $("#canviarFigura").animate({
             top: "+=500"
         });
@@ -727,7 +737,7 @@ function tempsAcabat(escacs) {
     if(escacs.torn === 1){
         color = "negres";
     }
-    alert("S'ha acabat es temps, guanyen les " + color);
+    missatgeGeneral("S'ha acabat es temps, guanyen les " + color);
 }
 
 function IntervalTemps(escacs){
@@ -902,12 +912,16 @@ function pintar(escacs, tablero) {
 
 //Temporizador 90 minuts per jugador en tota sa partida
 //Canviar es color des panel d'informació segons es torn
-
 $(document).ready(function () {
     var tablero = $("#tablero");
     var escacs;
     $("#seleccionarTemps").animate({
         top: "+=500"
+    });
+
+    $("div#totOpac").css({
+        width: $(window).width(),
+        height: $(window).height()
     });
 
     $("#enviarTemps").on("click", function () {
@@ -950,6 +964,19 @@ $(document).ready(function () {
             casACanviar.figura = escacs.figuresMortes[selected];
             escacs.figuresMortes.splice(selected, 1);
             pintar(escacs, tablero);
+        }
+        $("div#totOpac").css("display", "none");
+    });
+
+    $("div#totOpac").on("click", function () {
+        if($("#missatgeGeneral").css("top") !== "-300px"){
+            $("#missatgeGeneral").animate({
+                top: "-=500"
+            });
+        }
+
+        if($("#canviarFigura").css("top") === "-300px") {
+            $(this).css("display", "none");
         }
     });
 
