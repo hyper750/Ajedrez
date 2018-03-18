@@ -256,13 +256,14 @@ function Escacs(temps) {
                                     this.caselles[x][y].figura = this.caselles[i][j].figura;
                                     this.caselles[i][j].figura = tmpFigura;
                                     if (!rei.figura.jaque) {
+                                        console.log("X: " + x + " Y: " + y + " cap a X: " + i + " Y: " + j);
                                         return false;
                                     }
                                 }
                             }
                         }
                         cas.seleccionada = false;
-
+                        this.deseleccionar();
                     }
 
                 }
@@ -837,6 +838,7 @@ function click(tthis, escacs, tablero) {
                 //Si no esta en jaque per ahogado
                 escacs.acabat = true;
             }
+
 
             escacs.calcularJaque();
 
