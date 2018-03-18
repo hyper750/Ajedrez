@@ -65,14 +65,14 @@ function Escacs(temps) {
     //Colocar peces
     //NEGRES
     //PEONS
-    /*for(var x = 0; x < AMPLADA; x++){
+    for(var x = 0; x < AMPLADA; x++){
         this.caselles[1][x].figura = new Peon("black");
     }
     //BLANQUES
     //PEONS
     for(var x = 0; x < AMPLADA; x++){
         this.caselles[ALTURA-2][x].figura = new Peon("white");
-    }*/
+    }
 
     //TORRE CAVALL ALFIL REINA REI
     var color = ["black", "white"];
@@ -80,11 +80,11 @@ function Escacs(temps) {
     for(var x = 0; x < ALTURA; x += ALTURA-1) {
         this.caselles[x][0].figura = new Torre(color[num]);
         this.caselles[x][AMPLADA - 1].figura = new Torre(color[num]);
-        //this.caselles[x][1].figura = new Cavall(color[num]);
-       // this.caselles[x][AMPLADA - 2].figura = new Cavall(color[num]);
-        //this.caselles[x][2].figura = new Alfil(color[num]);
-        //this.caselles[x][AMPLADA - 3].figura = new Alfil(color[num]);
-        //this.caselles[x][3].figura = new Reina(color[num]);
+        this.caselles[x][1].figura = new Cavall(color[num]);
+        this.caselles[x][AMPLADA - 2].figura = new Cavall(color[num]);
+        this.caselles[x][2].figura = new Alfil(color[num]);
+        this.caselles[x][AMPLADA - 3].figura = new Alfil(color[num]);
+        this.caselles[x][3].figura = new Reina(color[num]);
         this.caselles[x][AMPLADA-4].figura = new Rei(color[num]);
         num++;
     }
