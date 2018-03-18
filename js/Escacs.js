@@ -673,10 +673,6 @@ function msgGuanyador(escacs) {
     missatgeGeneral("Han guanyat les " + guanyador);
 }
 
-function msgJaque(escacs) {
-    missatgeGeneral("Escolta es teu rei està amb jaque, mou-lo");
-}
-
 function msgNoEsElTeuTorn(escacs){
     missatgeGeneral("No es el teu torn");
 }
