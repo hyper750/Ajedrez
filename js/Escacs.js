@@ -227,21 +227,17 @@ function Escacs(temps) {
             col = "black";
         }
         var rei = null;
-        var xRei;
-        var yRei;
         for(var x = 0; x < this.caselles.length; x++){
             for(var y = 0; y < this.caselles[x].length; y++){
                 var cas = this.caselles[x][y];
                 if(cas.figura !== null && cas.figura instanceof Rei && cas.figura.color === col){
                     rei = cas;
-                    xRei = x;
-                    yRei = y;
                 }
             }
         }
 
         //Una vegada trobat es rei des color demanat
-        if(rei !== null){
+        if(rei.figura !== null){
             //Mogui on me mogui estic en jaque
             for(var x = 0; x < this.caselles.length; x++){
                 for(var y = 0; y < this.caselles[x].length; y++){
@@ -259,7 +255,7 @@ function Escacs(temps) {
                                     this.calcularJaque();
                                     this.caselles[x][y].figura = this.caselles[i][j].figura;
                                     this.caselles[i][j].figura = tmpFigura;
-                                    if (!rei.jaque) {
+                                    if (!rei.figura.jaque) {
                                         return false;
                                     }
                                 }
@@ -284,21 +280,6 @@ function Escacs(temps) {
             for(var y = 0; y < this.caselles[x].length; y++){
                 if(this.caselles[x][y].figura !== null && this.caselles[x][y].figura instanceof Rei){
                     this.caselles[x][y].figura.jaque = false;
-                }
-            }
-        }
-    };
-
-    this.reiAmbJaqueTurnoActual = function (color) {
-        var turno = "white";
-        if(color === 1){
-            turno = "black";
-        }
-        for(var x = 0; x < this.caselles.length; x++){
-            for(var y = 0; y < this.caselles[x].length; y++){
-                var cas = this.caselles[x][y];
-                if(cas.figura !== null && cas.figura instanceof Rei && cas.figura.color === turno){
-                    return cas.figura.jaque;
                 }
             }
         }
@@ -390,7 +371,7 @@ function Peon(color) {
                 }
             }
             //Si no tenc cap figura a sa que menjar després puc moure, si no obligat
-            if ((diagonalEsquerra == null || !diagonalEsquerra.preMoviment) && (diagonalDreta == null || !diagonalDreta.preMoviment)) {
+            //if ((diagonalEsquerra == null || !diagonalEsquerra.preMoviment) && (diagonalDreta == null || !diagonalDreta.preMoviment)) {
                 var pases = 1;
                 if (this.inicial) {
                     //+1
@@ -414,7 +395,7 @@ function Peon(color) {
                         break;
                     }
                 }
-            }
+            //}
         }
         //alert("DiagonalDreta: " + diagonalDreta.color + "\nDiagonalEsquerra: " + diagonalEsquerra.color);
     };
@@ -833,13 +814,13 @@ function click(tthis, escacs, tablero) {
             //Una vegada que canviat de torn canviar color des torn
             //I també mirar si es rei esta amb jaque
 
-            escacs.calcularJaque();
             if(escacs.calcularJaqueMate(escacs.torn)){
                 //Si esta en jaque es jaquemate
                 escacs.calcularJaque();
                 var rei = escacs.sercarRei(escacs.torn);
+                console.log("Color " + rei.torn + " esta en jaque? " + rei.jaque);
                 //Si està en jaque es jaquemate
-                if(rei.jaque){
+                if(rei.figura.jaque){
                     msgJaqueMate(escacs);
                 }
                 //Si no està en jaque pero mogui on es mogui hi estarà es jaque per ahogado
@@ -849,6 +830,8 @@ function click(tthis, escacs, tablero) {
                 //Si no esta en jaque per ahogado
 
             }
+
+            escacs.calcularJaque();
 
             pintar(escacs, tablero);
             //Mir si es jaquemate
