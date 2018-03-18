@@ -40,7 +40,7 @@ td.casellaPreMoviment{
     background-color: yellow;
 }
 div.informacio{
-    min-height: 630px;
+    min-height: 660px;
     width: 20%;
     float: left;
     border: 1px solid black;
@@ -87,7 +87,6 @@ img.imatgeTurno{
 }
 
 #llistaMoviments{
-    background-color: #39AECF;
     margin: 0;
     overflow-y: auto;
     height: 520px;
@@ -140,4 +139,22 @@ div.temps{
 p#tempsTorn{
     text-align: center;
     font-size: 28px;
+}
+
+div.caixaPecesMortes{
+    min-height: 500px;
+}
+
+div.caixaPecesMortes h1.titolInformacio{
+    height: 45px;
+}
+
+p#llistaPecesMortes{
+    overflow-y: auto;
+    height: 430px;
+}
+
+img.icona{
+    width: 70px;
+    height: 80px;
 }

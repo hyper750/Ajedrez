@@ -167,8 +167,7 @@ function Escacs(temps) {
 
                 //Permet canviar la figura
                 if((novaCasella.figura.color == "white" && x == 0) || (novaCasella.figura.color == "black" && x == this.caselles.length-1)){
-                    msgCanviarFigura(novaCasella, this, tablero);
-                    this.caselles[x][y].canviar = true;
+                    msgCanviarFigura(novaCasella, this);
                 }
             }
         }
@@ -689,6 +688,7 @@ function msgCanviarFigura(casella, escacs, tablero) {
     $("#figures").html(mostrar);
 
     if(cont > 0) {
+        casella.canviar = true;
         $("#canviarFigura").animate({
             top: "+=500"
         });
@@ -732,6 +732,21 @@ function IntervalTemps(){
     };
 }
 
+function pintarMortes(escacs) {
+    var torn = "white";
+    if(escacs.torn == 1){
+        torn = "black";
+    }
+    var resultat = "";
+    for(var x = 0; x < escacs.figuresMortes.length; x++){
+        var fig = escacs.figuresMortes[x];
+        if(fig.color == torn){
+            resultat += "<img class='icona' alt='" + fig.nom + "' src='" + fig.imatge + "'/>"
+        }
+    }
+    $("#llistaPecesMortes").html(resultat);
+}
+
 function pintar(escacs, tablero) {
     tablero.text("");
     for(var x = 0; x < escacs.caselles.length; x++){
@@ -760,9 +775,12 @@ function pintar(escacs, tablero) {
                         escacs.intervalTemps.stopInterval();
                         var tempsTorn = escacs.equipTemps[escacs.torn];
                         escacs.intervalTemps.startInterval();
+
                         escacs.torn = (escacs.torn + 1) % 2;
                         $("#tempsTorn").text(escacs.equipTemps[escacs.torn].getTemps(escacs.equipTemps[escacs.torn].tempsActual));
                         escacs.equipTemps[escacs.torn].startSessio();
+
+                        pintarMortes(escacs);
 
                         pintarLlistaMoviments(escacs);
                         //Una vegada que canviat de torn canviar color des torn
@@ -827,9 +845,9 @@ function pintar(escacs, tablero) {
 
 //Temporizador 90 minuts per jugador en tota sa partida
 //Canviar es color des panel d'informació segons es torn
-var tablero;
+
 $(document).ready(function () {
-    tablero = $("#tablero");
+    var tablero = $("#tablero");
     var escacs = new Escacs(90);
     pintar(escacs, tablero);
     var tempsTorn = escacs.equipTemps[escacs.torn];
