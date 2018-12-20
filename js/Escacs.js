@@ -336,7 +336,7 @@ function Peon(color) {
     else {
         this.imatge += "negres/";
     }
-    this.imatge += "peon.png";
+    this.imatge += "Peon.png";
 
     //Li pas sa seleccionada
     this.preMoviment = function (altura, amplada, caselles) {
