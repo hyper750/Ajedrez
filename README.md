@@ -1,2 +1,2 @@
 # Ajedrez
-Web application development client side project
+Web application development course client side project
